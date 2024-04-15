@@ -3,9 +3,9 @@ const mongoose=require("mongoose")
 const tasksSchema=mongoose.Schema({
     name:String,
     status:String,
-    date:String
 },{
-    versionKey:false
+    versionKey:false,
+    timestamps:true
 })
 
 const tasksModel=mongoose.model('task',tasksSchema)

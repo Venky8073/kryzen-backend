@@ -11,11 +11,51 @@ app.use(express.json())
 
 // request and responce
 app.get('/',async(req,res)=>{
+    let {status}=req.query
     try{
-        const tasks=await tasksModel.find()
+        let tasks=await tasksModel.find()
+        if(status){
+            tasks=await tasksModel.find({
+                status:status
+            })
+        }else{
+            tasks=await tasksModel.find()
+        }
         res.status(200).send({"data":tasks})
     }catch(err){
         res.status(400).send({"msg":"failed"})
+    }
+})
+
+app.get('/filtered',async(req,res)=>{
+    let {startDate,endDate,status}=req.query
+    try{
+        startDate = new Date(startDate);
+        endDate = new Date(endDate);
+
+        if(startDate && endDate){
+            startDate.setUTCHours(0, 0, 0, 0)
+            endDate.setUTCHours(23, 59, 59, 999)
+        }
+        
+        let data
+        if(startDate && endDate && status){
+            data = await tasksModel.find({
+                createdAt: { $gte: startDate, $lte: endDate },
+                status:status
+            });
+
+        }
+        else if(startDate && endDate){
+           data = await tasksModel.find({
+                createdAt: { $gte: startDate, $lte: endDate }
+            });
+        }
+        res.status(200).send({"data":data})
+        
+
+    }catch(err){
+        res.status(400).send({"msg":err})
     }
 })
 
